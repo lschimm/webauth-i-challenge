@@ -1,6 +1,9 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
+const cors = require("cors");
+const helmet = require("helmet");
 
-const auth = require("./auth-model.js");
+const Users = require("./auth-model.js");
 
 const router = express.Router();
 
@@ -37,5 +40,19 @@ router.get("/users", (req, res) => {
 
 //POST /api/register
 // **hash the password**
+
+router.post("/register", (req, res) => {
+  let user = req.body; //this gets the password
+  const hash = bcrypt.hashSync(user.password, 8); // 8^2 times of rehashing
+  user.password = hash;
+
+  Users.add(user)
+    .then(saved => {
+      res.status(201).json(saved);
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
 
 module.exports = router;
