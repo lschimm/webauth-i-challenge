@@ -38,6 +38,25 @@ router.get("/users", (req, res) => {
 
 // POST /api/login
 
+router.post("/login", (req, res) => {
+  let { username, password } = req.body;
+
+  Users.findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        res
+          .status(200)
+          .json({ message: `Welcome ${user.username}? (it works!)` });
+      } else {
+        res.status(401).json({ message: "invalid credentials" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
+
 //POST /api/register
 // **hash the password**
 
